@@ -10,6 +10,7 @@ Z = Transactions()
 
 # ----------------- Use ChatGPT API ----------------- #
 # https://beta.openai.com/docs/api-reference/chat
+
 @app.route('/api/v1.0/audio', methods=['POST'])
 
 def audio():

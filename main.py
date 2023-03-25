@@ -30,13 +30,10 @@ class Transactions(Base):
         session.close()
 
     @classmethod
-    # column_name = "date" or "type" or "amount" or "detail" or None (default)
     def read_from_db(self, column_name=None):
         Session = sessionmaker(bind=engine)
         session = Session()
 
-        # column = getattr(self.__class__, column_name = column_name)
-        # values = session.query(column_name).all()
         if column_name:
             values = session.query(getattr(self, column_name)).all()
         else:
@@ -95,7 +92,7 @@ class Transactions(Base):
         
         Base.metadata.drop_all(engine)
         Base.metadata.create_all(engine)
-        
+
         session.commit()
         session.close()
 
