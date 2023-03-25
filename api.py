@@ -10,7 +10,7 @@ Z = Transactions()
 # ----------------- Use ChatGPT API ----------------- #
 # https://beta.openai.com/docs/api-reference/chat
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 
 @app.route('/api/v1.0/audio', methods=['POST'])
@@ -21,7 +21,7 @@ def speech_to_text():
     audio = open("temp.mp3", "rb")
     transcript = openai.Audio.transcribe("whisper-1", audio)
     audio.close()
-    print(transcript)
+    # print(transcript)
     try:
         data = text_formatting(transcript)
         Z.write_to_db(date=data[0], type=data[2],
@@ -81,6 +81,7 @@ def get_all():
         item["amount"] = amount
         item["detail"] = detail
         data.append(item)
+    data.reverse()
     return data
 
 
