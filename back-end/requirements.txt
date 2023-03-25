@@ -1,5 +1,5 @@
 # pip3 install -r requirements.txt
 
-sqlalchemy
-Flask
-openai
+sqlalchemy==1.4.47
+Flask==2.2.3
+openai==0.27.2

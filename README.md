@@ -1,6 +1,10 @@
 # Tally - Personal_Finance_Tracker
  - Built by: Loya Niu, Zachariah Jia
  - March 25, 2023
+ 
+ - Back-end: 
+    - `pip3 install -r requirements.txt`
+    - `python3 api.py`
 
 ## Inspiration
  - We want to build a **financial management**.
