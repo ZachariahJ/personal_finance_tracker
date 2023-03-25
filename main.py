@@ -1,41 +1,103 @@
-# Description: This is the main file for tally
-# Author: Michael Navazhylau
-# Date: 12/12/2019
-# Version: 1.0.0
-# License: MIT
-# Usage: python main.py
-# Dependencies: Python 3.7.4, tkinter, sqlite3
-# Notes: This is a simple program that allows you to keep track of books you have read. It is a simple program that allows you to add, delete, and search for books. It also allows you to update the information of a book. This program is a simple project that I made to learn how to use tkinter and sqlite3. I hope you enjoy it!
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, Integer, Float, Date, Text
+from datetime import date
+from sqlalchemy import func
 
-import sqlite3
-class Database:
-    def __init__(self, db):
-        self.conn = sqlite3.connect(db)
-        self.cur = self.conn.cursor()
-        self.cur.execute("CREATE TABLE IF NOT EXISTS book (id INTEGER PRIMARY KEY, title text, author text, year integer, isbn integer)")
-        self.conn.commit()
+engine = create_engine("sqlite:///tally.db", echo=True)
+Base = declarative_base()
 
-    def insert(self, title, author, year, isbn):
-        self.cur.execute("INSERT INTO book VALUES (NULL, ?, ?, ?, ?)", (title, author, year, isbn))
-        self.conn.commit()
 
-    def view(self):
-        self.cur.execute("SELECT * FROM book")
-        rows = self.cur.fetchall()
-        return rows
+class Transactions(Base):
 
-    def search(self, title="", author="", year="", isbn=""):
-        self.cur.execute("SELECT * FROM book WHERE title=? OR author=? OR year=? OR isbn=?", (title, author, year, isbn))
-        rows = self.cur.fetchall()
-        return rows
+    __tablename__ = "table1"
 
-    def delete(self, id):
-        self.cur.execute("DELETE FROM book WHERE id=?", (id,))
-        self.conn.commit()
+    id = Column(Integer, primary_key=True)
+    date = Column('date', Text)
+    type = Column('type', Text)
+    amount = Column('amount', Float)
+    detail = Column('detail', Text)
 
-    def update(self, id, title, author, year, isbn):
-        self.cur.execute("UPDATE book SET title=?, author=?, year=?, isbn=? WHERE id=?", (title, author, year, isbn, id))
-        self.conn.commit()
+    @classmethod
+    def write_to_db(self, date, type, amount, detail):
+        Session = sessionmaker(bind=engine)
+        session = Session()
 
-    def __del__(self):
-        self.conn.close()
+        session.add(self(date=date, type=type, amount=amount, detail=detail))
+
+        session.commit()
+        session.close()
+
+    @classmethod
+    # column_name = "date" or "type" or "amount" or "detail" or None (default)
+    def read_from_db(self, column_name=None):
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        # column = getattr(self.__class__, column_name = column_name)
+        # values = session.query(column_name).all()
+        if column_name:
+            values = session.query(getattr(self, column_name)).all()
+        else:
+            values = session.query(self).all()
+
+        session.close()
+        return values
+
+    @classmethod
+    def sum_of_amount(self):
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        amounts = session.query(func.sum(self.amount)).scalar()
+        session.close()
+        return amounts
+
+    @classmethod
+    def sum_of_amount_by_type(self, type=None):
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        if type == None:
+            amounts = session.query(func.sum(self.amount)).scalar()
+        else:
+            amounts = session.query(func.sum(self.amount)
+                                    ).filter_by(type=type).scalar()
+
+        session.close()
+        return amounts
+
+    @classmethod
+    def delete_from_db(self, id):
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        session.query(self).filter_by(id=id).delete()
+        session.commit()
+        session.close()
+
+    @classmethod
+    def update_db(self, id, date, type, amount, detail):  # modify any transactions
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        session.query(self).filter_by(id=id).update(
+            {self.date: date, self.type: type, self.amount: amount, self.detail: detail})
+
+        session.commit()
+        session.close()
+    
+    @classmethod
+    def clear_all(self):
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        
+        Base.metadata.drop_all(engine)
+        Base.metadata.create_all(engine)
+        
+        session.commit()
+        session.close()
+
+
+Base.metadata.create_all(engine)
