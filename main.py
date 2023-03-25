@@ -16,7 +16,7 @@ class Transactions(Base):
     id = Column(Integer, primary_key=True)
     date = Column('date', Text)
     type = Column('type', Text)
-    amount = Column('amount', Float)
+    amount = Column('amount', Float, default=0.0)
     detail = Column('detail', Text)
 
     @classmethod
@@ -49,6 +49,8 @@ class Transactions(Base):
 
         amounts = session.query(func.sum(self.amount)).scalar()
         session.close()
+        if not amounts:
+            return 0
         return amounts
 
     @classmethod
@@ -58,9 +60,12 @@ class Transactions(Base):
 
         if type == None:
             amounts = session.query(func.sum(self.amount)).scalar()
-        else:
+        elif type == "expense":
             amounts = session.query(func.sum(self.amount)
-                                    ).filter_by(type=type).scalar()
+                                    ).filter(self.amount < 0).scalar()
+        elif type == "income":
+            amounts = session.query(func.sum(self.amount)
+                                    ).filter(self.amount > 0).scalar()
 
         session.close()
         return amounts
@@ -84,12 +89,12 @@ class Transactions(Base):
 
         session.commit()
         session.close()
-    
+
     @classmethod
     def clear_all(self):
         Session = sessionmaker(bind=engine)
         session = Session()
-        
+
         Base.metadata.drop_all(engine)
         Base.metadata.create_all(engine)
 
