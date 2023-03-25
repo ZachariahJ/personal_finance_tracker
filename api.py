@@ -10,7 +10,7 @@ Z = Transactions()
 # ----------------- Use ChatGPT API ----------------- #
 # https://beta.openai.com/docs/api-reference/chat
 
-openai.api_key = "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"
+openai.api_key = open(".env", "r").read().strip()
 
 
 @app.route('/api/v1.0/audio', methods=['POST'])
