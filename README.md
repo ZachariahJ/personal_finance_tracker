@@ -1,4 +1,4 @@
-# personal_finance_tracker
+# Tally - Personal_Finance_Tracker
  - Built by: Loya Niu, Zachariah Jia
  - March 25, 2023
 
