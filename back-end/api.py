@@ -8,7 +8,6 @@ app = Flask(__name__)
 Z = Transactions()
 
 # ----------------- Use ChatGPT API ----------------- #
-# https://beta.openai.com/docs/api-reference/chat
 
 openai.api_key = open(".env", "r").read().strip()
 
