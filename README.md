@@ -1,5 +1,5 @@
 # Tally - Personal_Finance_Tracker
- - Built by: Loya Niu, Zachariah Jia
+ - Built by: Zhonglin(Loya) Niu, Zachariah Jia
  - March 25, 2023
  
  - Back-end: 
